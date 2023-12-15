@@ -1,35 +1,35 @@
-import json
-from tkinter import messagebox, ttk
 import customtkinter as ctk
+import json
+import sys
+from tkinter import messagebox
+
 
 class Panel(ctk.CTk):
-    """Curdle Configuration Panel made with ctk"""
+    """Curdle Configuration Panel made with CTK"""
 
     def __init__(self):
         """Initialize Panel Class"""
         super().__init__()  # inherit ctk root & its methods
 
         # Class Variables
-        self.__bg = "#343541"  # panel background colour
-        self.__fg = "#FFFFFF"  # text foreground colour
-        self.__size = "600x300"  # panel dimensions
-
+        self.__size = "450x215"  # panel dimensions
 
         # Window Pre-Configuration
-        self.title("Cu-rdle Configuration Panel")  # set panel name
-        self.geometry(f"{self.__size}")  # set panel size
-        self.configure(bg=self.__bg)  # set background colour
+        self.title("Curdle Game Setup")  # set panel name
+        self.geometry(self.__size)  # set panel size
+        ctk.set_appearance_mode('dark')  # set dark mode
+        ctk.set_default_color_theme('blue')  # set blue theme
+        self.resizable(width=False, height=False)  # disable resizing
         self.create_widgets()  # create & place all widgets
-
 
     def create_widgets(self):
         """Method to create & place all widgets"""
 
         # ctk Variables
         self.__diff_var = ctk.IntVar()  # difficulty variable
-        self.__ai_var = ctk.StringVar(value="on")  # ai boolean variable
-        self.__wrd_var = ctk.IntVar()  # word length variable
+        self.__ai_var = ctk.StringVar(value="off")  # ai boolean variable
         self.__guess_var = ctk.IntVar()  # guess length variable
+        self.__wrd_var = ctk.IntVar()  # word length variable
         self.__how_var = ctk.StringVar(value="on")  # tutorial variable
 
         # Default Word Length
@@ -39,89 +39,57 @@ class Panel(ctk.CTk):
         self.__guess_var.set(6)
 
         # Panel Labels
-        intro_label = ctk.CTkLabel(self, text="Welcome to CU-RDLE", font=("Open Sans", 18))  # title header
-        diff_label = ctk.CTkLabel(self, text="Difficulty: ")  # difficulty label
+        intro_label = ctk.CTkLabel(self, text="Welcome to Curdle!", font=("Open Sans", 18))  # title header
+        guess_label = ctk.CTkLabel(self, text="Guesses: ")  # guesses label
+        guess_val_label = ctk.CTkLabel(self, textvariable=self.__guess_var)  # guess len display
         wrd_len_label = ctk.CTkLabel(self, text="Word Length: ")  # word length label
-        guess_label = ctk.CTkLabel(self, text="Guess Amount: ")  # guesses label
+        wrd_val_label =ctk.CTkLabel(self, textvariable=self.__wrd_var) # word len val display
 
         # Panel Buttons
         norm_radio = ctk.CTkRadioButton(self, text="Normal", variable=self.__diff_var, value=1)  # normal difficulty
-        hard_radio = ctk.CTkRadioButton(self, text="Hard", variable=self.__diff_var, value=2)  # hard difficulty
+        hard_radio = ctk.CTkRadioButton(self, text="Hard Mode", variable=self.__diff_var, value=2)  # hard difficulty
         insane_radio = ctk.CTkRadioButton(self, text="Insane", variable=self.__diff_var, value=3)  # insane difficulty
-        ai_check = ctk.CTkSwitch(self, text="AI Mode", variable=self.__ai_var, onvalue="on", offvalue="off")  # ai button
-        word_len_spin = ttk.Spinbox(self, from_=3, to=6, textvariable=self.__wrd_var)  # word length spinbox
-        guess_spin = ttk.Spinbox(self, from_=3, to=10, textvariable=self.__guess_var)  # guess amt spinbox
+        guess_slide = ctk.CTkSlider(self, from_=3, to=10, variable=self.__guess_var)  # guess amt spinbox
+        wrd_len_slide = ctk.CTkSlider(self, from_=3, to=6, variable=self.__wrd_var)  # word length spinbox
+        ai_check = ctk.CTkSwitch(self, text="AI Mode", variable=self.__ai_var, onvalue="on", offvalue="off")  # ai button   
         start_button = ctk.CTkButton(self, text="Start", command=self.start)  # start
         how_button = ctk.CTkSwitch(self, text="Tutorial Video", variable=self.__how_var, onvalue="on", offvalue="off")  # tutorial
 
         # Panel Layout
-        intro_label.grid(row=0, column=2, pady=(0, 50))  # place intro header
+        intro_label.grid(row=0, column=0, columnspan=3, pady=(10, 20))
 
-        diff_label.grid(row=2, column=0, sticky="w")
-        norm_radio.grid(row=2, column=1, sticky="w")
-        hard_radio.grid(row=2, column=2, sticky="w")
-        insane_radio.grid(row=2, column=3, sticky="w")
+        norm_radio.grid(row=1, column=0, padx=(15, 0), pady=(0, 10))
+        hard_radio.grid(row=1, column=1, pady=(0, 10))
+        insane_radio.grid(row=1, column=2, pady=(0, 10))
 
-        wrd_len_label.grid(row=3, column=0, sticky="w")
-        word_len_spin.grid(row=3, column=2)
+        guess_label.grid(row=3, column=0, pady=(0, 10))
+        guess_slide.grid(row=3, column=1, pady=(0, 10))
+        guess_val_label.grid(row=3, column=2, pady=(0, 10))
 
-        guess_label.grid(row=4, column=0, sticky="w")
-        guess_spin.grid(row=4, column=2)
+        wrd_len_label.grid(row=4, column=0, pady=(0, 10))
+        wrd_len_slide.grid(row=4, column=1, pady=(0, 10))
+        wrd_val_label.grid(row=4, column=2, pady=(0, 10))
 
-        start_button.grid(row=5, column=4)
-        ai_check.grid(row=6, column=0)
-        how_button.grid(row=7, column=0)
+        start_button.grid(row=5, column=1)
+        ai_check.grid(row=5, column=0)
+        how_button.grid(row=5, column=2)
+
 
     def start(self):
         """Method to perform value checks & start game"""
 
         # Determine Difficulty
-        if (self.__diff_var.get() == 1):
-            diff = "Normal"
-        elif (self.__diff_var.get() == 2):
-            diff = "Hard"
-        elif (self.__diff_var.get() == 3):
-            diff = "Insane"
-        else:
+        diff_values = {1: "Normal", 2: "Hard", 3: "Insane"}
+        diff = diff_values.get(self.__diff_var.get(), None)
+
+        if (diff == None):
             messagebox.showerror('Difficulty Error', 'Error: Please choose a difficulty')  # error
             return  # do not start
-
-        # Ensure Valid Values
-        try:
-            int(self.__wrd_var.get())
-        except:
-            messagebox.showerror('Word Length Error', 'Error: Please choose a valid word length')  # error
-            return  # do not start
-        try:
-            int(self.__guess_var.get())
-        except:
-            messagebox.showerror('Guess Length Error', 'Error: Please choose a valid guess length')  # error
-            return  # do not start
-
-        # Check Values' Domain
-        if (3 <= self.__wrd_var.get() <= 6):
-            word_len = self.__wrd_var.get()
-        else:
-            messagebox.showinfo('Invalid Word Length', 'Defaulting to Word Length of 5')
-            word_len = 5
-
-        if (3 <= self.__guess_var.get() <= 10):
-            guess_len = self.__guess_var.get()
-        else:
-            messagebox.showinfo('Invalid Guess Length', 'Defaulting to Guess Length of 6')
-            guess_len = 6
-
-        # Show/Don't Show Tutorial
-        if (self.__how_var.get() == "on"):
-            show_tuto = True
-        else:
-            show_tuto = False
-
-        # Use/Not Use AI
-        if (self.__ai_var.get() == "on"):
-            use_ai = True
-        else:
-            use_ai = False
+        
+        word_len = self.__wrd_var.get()
+        guess_len = self.__guess_var.get()
+        show_tuto = (self.__how_var.get() == "on")
+        use_ai = (self.__ai_var.get() == "on")
 
         # Write Data to JSON
         game_settings = {
@@ -131,39 +99,20 @@ class Panel(ctk.CTk):
             "tutorial": show_tuto,
             "AIMode": use_ai
         }
-        with open("Database/config.json", "w") as config_file:
-            json.dump(game_settings, config_file, indent=4)
-        messagebox.showinfo('Launching Curdle', "The game will begin momentarily")
-
-    def video(self):
-        """Method to play tutorial video"""
-        pass
-
-    def get_bg(self):
-        """Accessor Method: Panel Background"""
-        return self.__bg
-    
-
-    def get_fg(self):
-        """Accessor Method: Buttons' Foreground"""
-        return self.__fg
-
+        try:
+            with open("Database/config.json", "w") as config_file:
+                json.dump(game_settings, config_file, indent=4)
+            messagebox.showinfo('Launching Curdle', "The game will begin momentarily")
+            self.destroy()  # close panel
+        except:
+            messagebox.showerror('Missing CONFIG Folder', 'Error: Missing Database Folder. Closing program.')
+            sys.exit()
 
     def get_size(self):
         """Accessor Method: Panel Size"""
         return self.__size
 
-
     def set_size(self, length, width):
         """Mutator Method: Panel Size"""
         new_size = f"{length}x{width}"
         self.__size = new_size
-
-
-    def set_bg(self, new_bg):
-        """Mutator Method: Set Background"""
-        self.__bg = new_bg
-
-
-pan = Panel()
-pan.mainloop()  
