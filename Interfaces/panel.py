@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import json
+from platform import system
 import sys
 from tkinter import messagebox
 
@@ -21,6 +22,14 @@ class Panel(ctk.CTk):
         ctk.set_default_color_theme('blue')  # set blue theme
         self.resizable(width=False, height=False)  # disable resizing
         self.create_widgets()  # create & place all widgets
+
+        # Icon Based on Platform
+        device = system()
+        if (device == 'Darwin'):
+            logo = 'images/logo.icns'
+        elif (device == 'Windows'):
+            logo = 'images/logo.ico'
+        self.iconbitmap(logo)
 
     def create_widgets(self):
         """Method to create & place all widgets"""
