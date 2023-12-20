@@ -10,7 +10,6 @@ REM Install PyGame
 python -m pip install PyGame
 
 REM Starting Curdle Game
-
 python3 Jetha_Rehan_Curdle.py
 
 echo Dependencies have been installed. Launching Game.
