@@ -26,9 +26,9 @@ def game():
     # Generate Word List
     WORD_LIST = filter_words(WORDS_PATH, WORD_LEN)
 
-    # Correct Random Word
+    # Hidden Random Word
     rand_idx = random.randint(0, len(WORD_LIST) - 1)
-    CORRECT_WORD = WORD_LIST[rand_idx]
+    HIDDEN_WORD = WORD_LIST[rand_idx]
 
 
 
