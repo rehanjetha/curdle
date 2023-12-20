@@ -1,10 +1,43 @@
 from Logic.search_sort import filter_words
 import json
 import pygame
+import random
 import sys
+import vlc
 
-WORD_LEN = 3
-WORD_FILE_PATH = 'Database/words.txt'
+def game():
+    """Full Curdle Game Function"""
+
+    # File Paths
+    CONFIG_PATH = 'Database/config.json'
+    WORDS_PATH = 'Database/words.txt'
+    TUTORIAL_PATH = 'Resources/tutorial.mp4'
+
+    # Fetch Game Settings (Constants)
+    with open(CONFIG_PATH, 'r') as config_file:
+        json_config = json.load(config_file)  # load as dictionary
+        # Game Settings
+        DIFFICULTY = json_config.get('difficulty')
+        WORD_LEN = json_config.get('wordLength')
+        GUESS_LEN = json_config.get('guessLength')
+        TUTORIAL_MODE = json_config.get('tutorial')
+        AI_MODE = json_config.get('AIMode')
+
+    # Generate Word List
+    WORD_LIST = filter_words(WORDS_PATH, WORD_LEN)
+
+    # Correct Random Word
+    rand_idx = random.randint(0, len(WORD_LIST) - 1)
+    CORRECT_WORD = WORD_LIST[rand_idx]
+
+
+
+    # Play Tutorial (if needed)
+    if (TUTORIAL_MODE):
+        video = vlc.MediaPlayer(TUTORIAL_PATH)
+        video.play()
+
+
 
 
 
