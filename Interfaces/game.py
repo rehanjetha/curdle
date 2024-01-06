@@ -3,11 +3,12 @@ import json
 import pygame
 import random
 import sys
-import vlc
+#import vlc
 
 def game():
     """Full Curdle Game Function"""
 
+# Configuration Setup:
     # File Paths
     CONFIG_PATH = 'Database/config.json'
     WORDS_PATH = 'Database/words.txt'
@@ -22,48 +23,77 @@ def game():
         GUESS_LEN = json_config.get('guessLength')
         TUTORIAL_MODE = json_config.get('tutorial')
         AI_MODE = json_config.get('AIMode')
-
     # Generate Word List
     WORD_LIST = filter_words(WORDS_PATH, WORD_LEN)
 
-    # Hidden Random Word
-    rand_idx = random.randint(0, len(WORD_LIST) - 1)
-    HIDDEN_WORD = WORD_LIST[rand_idx]
-
-
-
-    # Play Tutorial (if needed)
+    """
+# Play Tutorial Video (if needed)
     if (TUTORIAL_MODE):
         video = vlc.MediaPlayer(TUTORIAL_PATH)
         video.play()
-
-
-
-
-
 """
-pygame.init()
 
-screen = pygame.display.set_mode((1280, 720))
-clock = pygame.time.Clock()
-running = True
+# PyGame Initial Setup
+    pygame.init()  # initialize pygame
 
-while running:
-    # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    # PyGame Configuration Values
+    WIDTH, HEIGHT = 500, (150*GUESS_LEN)  # make static width & dynamic height
+    ICON = pygame.image.load('Resources/Icons/curdle_icon.png')  # load curdle icon
+    CAPTION = "Curdle Game"  # make curdle caption
+    FPS = 60  # limit game to 60fps
 
-    # fill the screen with a color to wipe away anything from last frame
-    screen.fill("purple")
+    COLOURS = {
+        "BLACK": (36, 36, 36),
+        "WHITE": (255, 255, 255),
+        "GREEN": (1, 154, 1),
+        "YELLOW": (255, 196, 37),
+        "GREY": (128, 128, 128)
+    }  # custom rgb game colours
 
-    # RENDER YOUR GAME HERE
+    # Window Configuration (Execution)
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))  # set width & height
+    screen.fill(COLOURS["BLACK"])  # set background colour
+    pygame.display.set_icon(ICON)  # set icon
+    pygame.display.set_caption(CAPTION)  # set caption
+    letter_font = pygame.font.Font('Resources/Helvetica.otf', 50)  # set font & size
+    clock = pygame.time.Clock()  # game clock
 
-    # flip() the display to put your work on screen
-    pygame.display.flip()
+# PyGame Curdle
+    # Settings
+    game_over = False  # game flag
+    ANSWER = WORD_LIST[random.randint(0, len(WORD_LIST) - 1)]  # random word (answer)
+    guess = ""  # user's guess
+    global turn
+    turn = 0  # current turn
 
-    clock.tick(60)  # limits FPS to 60
+    # Create Board (2D List)
+    global board
+    board = [None] * GUESS_LEN
+    for row in range(GUESS_LEN):
+        board[row] = [" "] * WORD_LEN
 
-pygame.quit()
-"""
+    def create_board():
+        global turn
+        global board
+        for i in range(0, WORD_LEN):
+            for j in range(0, GUESS_LEN):
+                pygame.draw.rect(screen, COLOURS['WHITE'], [i * 100 + 12, j * 100 + 12, 75, 75], 3, 5)
+                piece_text = letter_font.render(board[i][j], True, COLOURS['GREEN'])
+                screen.blit(piece_text, (i * 100 + 30, j * 100 + 25))
+        pygame.draw.rect(screen, COLOURS['GREEN'], [5, turn * 100 + 5, WIDTH - 10, 90], 3, 5)
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if (event.type == pygame.QUIT):
+                running = False  # close game
+
+            if (event.type == pygame.KEYDOWN):
+                pass
+
+        create_board()
+        pygame.display.flip()  # display game
+        clock.tick(FPS)  # advance screen
+    pygame.quit()
+
+

@@ -1,5 +1,6 @@
 def filter_words(file_path, length):
     """Function: Filter word file by word length"""
+    
     # Sequential Search (Adaptation)
     new_words = []  # filtered words list
     with open(file_path, 'r') as word_file:
