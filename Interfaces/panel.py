@@ -20,7 +20,9 @@ class Panel(ctk.CTk):
         ctk.set_appearance_mode('dark')  # set dark mode
         ctk.set_default_color_theme('blue')  # set blue theme
         self.resizable(width=False, height=False)  # disable resizing
-        self.create_widgets()  # create & place all widgets
+        self.create_widgets()  # create & place all widgetsdef on_closing():
+        self.protocol("WM_DELETE_WINDOW", sys.exit)  # close entire pgm if config closed
+
 
     def create_widgets(self):
         """Method to create & place all widgets"""

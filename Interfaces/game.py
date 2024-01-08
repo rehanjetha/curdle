@@ -37,7 +37,7 @@ def game():
     pygame.init()  # initialize pygame
 
     # PyGame Configuration Values
-    WIDTH, HEIGHT = 500, (150*GUESS_LEN)  # make static width & dynamic height
+    WIDTH, HEIGHT = 400, 800
     ICON = pygame.image.load('Resources/Icons/curdle_icon.png')  # load curdle icon
     CAPTION = "Curdle Game"  # make curdle caption
     FPS = 60  # limit game to 60fps
@@ -64,7 +64,7 @@ def game():
     ANSWER = WORD_LIST[random.randint(0, len(WORD_LIST) - 1)]  # random word (answer)
     guess = ""  # user's guess
     global turn
-    turn = 0  # current turn
+    turn = 1  # current turn (global)
 
     # Create Board (2D List)
     global board
@@ -77,10 +77,8 @@ def game():
         global board
         for i in range(0, WORD_LEN):
             for j in range(0, GUESS_LEN):
-                pygame.draw.rect(screen, COLOURS['WHITE'], [i * 100 + 12, j * 100 + 12, 75, 75], 3, 5)
-                piece_text = letter_font.render(board[i][j], True, COLOURS['GREEN'])
-                screen.blit(piece_text, (i * 100 + 30, j * 100 + 25))
-        pygame.draw.rect(screen, COLOURS['GREEN'], [5, turn * 100 + 5, WIDTH - 10, 90], 3, 5)
+                pass
+                
 
     running = True
     while running:
@@ -91,7 +89,10 @@ def game():
             if (event.type == pygame.KEYDOWN):
                 pass
 
-        create_board()
+        create_board()  # redraw the board
+
+
+        
         pygame.display.flip()  # display game
         clock.tick(FPS)  # advance screen
     pygame.quit()
