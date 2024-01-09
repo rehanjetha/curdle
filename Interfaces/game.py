@@ -2,6 +2,7 @@ from Logic.search_sort import filter_words
 import json
 import pygame
 import random
+from tkinter import messagebox
 import vlc
 
 def game():
@@ -103,34 +104,39 @@ def game():
         for i in range(board[turn]):  # fetch current word str
             word += i
         word.lower()  # ensure lowercase letters
+        if (len(word) == WORD_LEN):
+            return False
         if (word in WORD_LIST):
             turn += 1  # inc turn
-            rev_board()  # display changes to board
+            return True
 
 
     running = True
     while running:
         for event in pygame.event.get():
-            if (event.type == pygame.QUIT):
+            if (event.type == pygame.QUIT):  # window closed
                 running = False  # close game
 
-            if (event.type == pygame.TEXTINPUT):
+            if (event.type == pygame.KEYDOWN):  # some key is pressed
+                if (event.type == pygame.K_KP_ENTER):  # enter key was pressed
+                    if not(word_check()):  # not valid word
+                        messagebox.showerror('Invalid Word', "Not a valid word.")  # show error
+                        continue  # next iteration
+
+
+
+
+
+                if (event.type == pygame.K_BACKSPACE):
+                    board[turn][pos] = " "  # clear space
+
                 pass
+
             draw_board()  # draw the board
             pygame.display.flip()  # display game
             clock.tick(FPS)  # advance screen
 
-
-
-
-
-
-
-
-
-            if (event.type == pygame.KEYDOWN):
-                pass
-
     pygame.quit()
+
 
 
