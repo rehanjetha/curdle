@@ -32,7 +32,7 @@ class Panel(ctk.CTk):
         self.__ai_var = ctk.StringVar(value="off")  # ai boolean variable
         self.__guess_var = ctk.IntVar()  # guess length variable
         self.__wrd_var = ctk.IntVar()  # word length variable
-        self.__how_var = ctk.StringVar(value="on")  # tutorial variable
+        self.__how_var = ctk.StringVar(value="off")  # tutorial variable
 
         # Defaut Difficulty
         self.__diff_var.set(1)

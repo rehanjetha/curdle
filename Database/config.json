@@ -2,6 +2,6 @@
     "difficulty": "Normal",
     "wordLength": 5,
     "guessLength": 6,
-    "tutorial": true,
+    "tutorial": false,
     "AIMode": false
 }
