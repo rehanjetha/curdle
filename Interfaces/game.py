@@ -1,4 +1,5 @@
 from Logic.search_sort import filter_words
+import copy
 import json
 import pygame
 import random
@@ -49,9 +50,10 @@ def game():
     COLOURS = {
         "BLACK": (36, 36, 36),
         "WHITE": (255, 255, 255),
-        "GREEN": (1, 154, 1),
+        "GREEN": (144, 238, 144	),
         "YELLOW": (255, 196, 37),
-        "GREY": (128, 128, 128)
+        "RED": (255, 71, 76),
+        "GREY": (98, 106, 108)
     }  # custom rgb game colours
 
     # Window Configuration (Execution)
@@ -63,14 +65,16 @@ def game():
     clock = pygame.time.Clock()  # game clock
 
     # Curdle Game Variables
-    ANSWER = WORD_LIST[random.randint(0, len(WORD_LIST) - 1)]  # choose a random word (answer)
-    global game_over  # global game over var
-    game_over = False  # game flag
+    global ANSWER  # global answer var
     global player_turn  # global player turn var
-    player_turn = True  # player turn flag
+    global game_over  # global game over var
     global turn  # make global turn var
-    turn = 0  # current turn
     global pos  # make global pos var
+
+    ANSWER = "liner"#WORD_LIST[random.randint(0, len(WORD_LIST) - 1)]  # choose a random word (answer)
+    player_turn = True  # player turn flag
+    game_over = False  # game over flag
+    turn = 0  # current turn
     pos = 0  # position on board
 
     # Create Global Board (2D List)
@@ -79,63 +83,113 @@ def game():
     for row in range(GUESS_LEN):
         board[row] = [" "] * WORD_LEN
 
+    # Create Global Colour Board (2D List)
+    global col_board
+    col_board = copy.deepcopy(board)  # make board copy
+    
+
 
 # Game Functions:
     def rev_board():
         """Reveal board information based on difficulty (colours)"""
-        pass
+        global board
+        global col_board
+        global turn
+        global pos
+
+        guess = ""  # guess str
+        for char in board[turn]:  # fetch current guess str
+            guess += char
+
+        if (guess == ANSWER):  # entirely correct
+            for i in range(0, WORD_LEN):
+                col_board[turn][i] = COLOURS['GREEN']  # all letters are right
+            return True  # game won
+        
+        matches = set()  # all hits on exact letter in spot
+        dyn_ans = ANSWER  # make mutable copy of answer
+
+        for x in range(0, WORD_LEN):
+            if (guess[x] == ANSWER[x]):
+                col_board[turn][x] = COLOURS['GREEN']  # right letter in right pos
+                dyn_ans = dyn_ans[:x] + ' ' + dyn_ans[x + 1:]  # replace char with space
+                matches.add(x)  # add index to matches
+
+        for x in range(0, WORD_LEN):
+            if (guess[x] in dyn_ans) and (x not in matches):
+                col_board[turn][x] = COLOURS['YELLOW']  # right letter in wrong pos
+                matches.add(dyn_ans.index(guess[x]))  # add index to matches
+                dyn_ans = dyn_ans[:x] + ' ' + dyn_ans[x + 1:]  # replace char with space
+            elif (x not in matches):
+                col_board[turn][x] = COLOURS['RED']  # not a letter in answer
+
+        turn += 1  # next turn
+        pos = 0  # reset position
+
+        if (turn >= GUESS_LEN):
+            return True  # game loss
+        else:
+            return False
 
 
-    def draw_board():
+    def make_board():
         """Display board to screen"""
         global board
         global turn
-        for i in range(0, len(board)):
-            for j in range(0, len(board[i])):
-                pygame.draw.rect(screen, COLOURS['WHITE'], pygame.Rect((20 + j * X_DIST), (20 + (i * Y_DIST)), 60, 60), 2)  # draw rects
-                char_text = letter_font.render(board[i][j], True, COLOURS['GREY'])  # display text with wordle font (in grey)
-                screen.blit(char_text, (j * X_DIST + 35, i * Y_DIST + 31))  # display text to screen in center of boxes
+        for i in range(len(board)):
+            for j in range(len(board[i])):
+                pygame.draw.rect(screen, COLOURS['WHITE'], pygame.Rect((20 + j * X_DIST), (20 + i * Y_DIST), 60, 60), 2)  # draw box
+                if (col_board[i][j] != " "):  # there is a colour for letter
+                    pygame.draw.rect(screen, col_board[i][j], pygame.Rect((20 + j * X_DIST), (20 + i * Y_DIST), 60, 60))  # draw box
+                char_text = letter_font.render(board[i][j], True, COLOURS['GREY'])  # get current char
+                screen.blit(char_text, (j * X_DIST + 35, i * Y_DIST + 31))  # display current char
+
 
     def word_check():
         """Validate word inputs (on enter)"""
         global board
         global turn
         word = ""  # word str
-        for i in range(board[turn]):  # fetch current word str
-            word += i
-        word.lower()  # ensure lowercase letters
-        if (len(word) == WORD_LEN):
+        for char in board[turn]:  # fetch current word str
+            word += char
+        if (len(word) != WORD_LEN):  # if not valid len
             return False
-        if (word in WORD_LIST):
-            turn += 1  # inc turn
+        if (word in WORD_LIST):  # if it's an actual word
             return True
-
+        else:  # not valid word
+            return False
 
     running = True
     while running:
+        screen.fill(COLOURS['BLACK'])  # paint over old characters
+        make_board()  # draw the board
+        pygame.display.flip()  # display game
+
         for event in pygame.event.get():
-            if (event.type == pygame.QUIT):  # window closed
+            if (event.type == pygame.QUIT) or (game_over):  # window closed
+                messagebox.showinfo('Game Over', 'Thanks for playing!')  # end msg
                 running = False  # close game
+                break  # close loop
 
             if (event.type == pygame.KEYDOWN):  # some key is pressed
-                if (event.type == pygame.K_KP_ENTER):  # enter key was pressed
-                    if not(word_check()):  # not valid word
+                if (event.key == pygame.K_KP_ENTER) or (event.key == pygame.K_RETURN):  # enter key was pressed (or return for mac)
+                    print(ANSWER)
+                    valid_word = word_check()  # check if current word is real & valid
+                    if (valid_word):  # not valid word
+                        game_over = rev_board()  # reveal the board visually & find out if game is over
+                    else:
                         messagebox.showerror('Invalid Word', "Not a valid word.")  # show error
                         continue  # next iteration
 
+                if (event.key == pygame.K_BACKSPACE):
+                    if (pos > 0):
+                        pos -= 1  # move left on board
+                        board[turn][pos] = " "  # delete letter
+                elif (event.unicode.isalpha()) and (pos < WORD_LEN) and (event.key != pygame.K_SPACE):
+                    board[turn][pos] = event.unicode.lower()  # insert letter
+                    pos += 1  # move to next slot
 
-
-
-
-                if (event.type == pygame.K_BACKSPACE):
-                    board[turn][pos] = " "  # clear space
-
-                pass
-
-            draw_board()  # draw the board
-            pygame.display.flip()  # display game
             clock.tick(FPS)  # advance screen
-
     pygame.quit()
 
 
