@@ -3,6 +3,7 @@ import copy
 import json
 import pygame
 import random
+import tkinter
 from tkinter import messagebox
 import vlc
 
@@ -177,9 +178,13 @@ def game():
 
         for event in pygame.event.get():
             if (event.type == pygame.QUIT) or (game_over):  # window closed
-                messagebox.showinfo('Game Over', 'Thanks for playing!')  # end msg
-                running = False  # close game
-                break  # close loop
+                restart_flag = messagebox.askquestion('Game Over', 'Game Over\nWould you like to restart?')  # end msg
+                if (restart_flag == 'yes'):
+                    pygame.quit()  # close pygame
+                    return True  # send true via game()
+                else:
+                    running = False  # close game
+                    break  # close loop
 
             if (event.type == pygame.KEYDOWN):  # some key is pressed
                 if (event.key == pygame.K_KP_ENTER) or (event.key == pygame.K_RETURN):  # enter key was pressed (or return for mac)
