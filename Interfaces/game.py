@@ -115,21 +115,21 @@ def game():
                 col_board[turn][i] = COLOURS['GREEN']  # all letters are right
             return True  # game won
         
-        matches = set()  # all hits on exact letter in spot
+        matches = []  # all hits on exact letter in spot
         dyn_ans = list(ANSWER)  # make mutable copy of answer
 
         if (DIFFICULTY != "Insane"):
             for x in range(0, WORD_LEN):
                 if (guess[x] == ANSWER[x]):
                     col_board[turn][x] = COLOURS['GREEN']  # right letter in right pos
-                    matches.add(x)  # add index to matches
+                    matches.append(x)  # add index to matches
                     dyn_ans[x] = ' '  # erase char with empty str
 
         for x in range(0, WORD_LEN):
             if (guess[x] in dyn_ans) and (x not in matches):
                 idx = x  # find idx in dyn_ans
                 col_board[turn][x] = COLOURS['YELLOW']  # right letter in wrong pos
-                matches.add(idx)  # add index to matches
+                matches.append(idx)  # add index to matches
                 dyn_ans[dyn_ans.index(guess[x])] = ' '  # remove char, replace with str
             elif (col_board[turn][x] == " "):  # if still not coloured
                 col_board[turn][x] = COLOURS['RED']  # not a letter in answer
@@ -178,7 +178,7 @@ def game():
 
         for event in pygame.event.get():
             if (event.type == pygame.QUIT) or (game_over):  # window closed
-                restart_flag = messagebox.askquestion('Game Over', 'Game Over\nWould you like to restart?')  # end msg
+                restart_flag = messagebox.askquestion('Game Over', f'ANSWER: "{ANSWER}"\nWould you like to restart?')  # end msg
                 if (restart_flag == 'yes'):
                     pygame.quit()  # close pygame
                     return True  # send true via game()
@@ -188,7 +188,7 @@ def game():
 
             if (event.type == pygame.KEYDOWN):  # some key is pressed
                 if (event.key == pygame.K_KP_ENTER) or (event.key == pygame.K_RETURN):  # enter key was pressed (or return for mac)
-                    print(ANSWER)
+                    #print(ANSWER)
                     valid_word = word_check()  # check if current word is real & valid
                     if (valid_word):  # not valid word
                         game_over = rev_board()  # reveal the board visually & find out if game is over

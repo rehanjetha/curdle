@@ -106,7 +106,6 @@ class Panel(ctk.CTk):
         try:
             with open("Database/config.json", "w") as config_file:
                 json.dump(game_settings, config_file, indent=4)
-            messagebox.showinfo('Launching Curdle', "The game will begin momentarily")
             self.destroy()  # close panel
         except:
             messagebox.showerror('Missing CONFIG Folder', 'Error: Missing Database Folder. Closing program.')
