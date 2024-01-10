@@ -11,6 +11,7 @@ def game():
 
     # File Paths
     CONFIG_PATH = 'Database/config.json'
+    ans_words_path = 'Database/ez_words.txt'  # ez words by default
     WORDS_PATH = 'Database/words.txt'
     TUTORIAL_PATH = 'Resources/tutorial.mp4'
 
@@ -30,7 +31,13 @@ def game():
         GUESS_LEN = json_config.get('guessLength')
         TUTORIAL_MODE = json_config.get('tutorial')
         AI_MODE = json_config.get('AIMode')
+
+    # Normal / Hard / Insane
+    if (DIFFICULTY == "Hard") or (DIFFICULTY == "Insane"):
+        ans_words_path = 'Database/words.txt'  # answer words are harder
+    
     WORD_LIST = filter_words(WORDS_PATH, WORD_LEN)  # generate all possible words list
+    ANS_WORD_LIST = filter_words(ans_words_path, WORD_LEN)  # generate all answer words list
 
     # Play Tutorial Video (if needed)
     if (TUTORIAL_MODE):
@@ -71,7 +78,7 @@ def game():
     global turn  # make global turn var
     global pos  # make global pos var
 
-    ANSWER = "liner"#WORD_LIST[random.randint(0, len(WORD_LIST) - 1)]  # choose a random word (answer)
+    ANSWER = ANS_WORD_LIST[random.randint(0, len(ANS_WORD_LIST) - 1)]  # choose a random word (answer)
     player_turn = True  # player turn flag
     game_over = False  # game over flag
     turn = 0  # current turn
@@ -92,6 +99,7 @@ def game():
 # Game Functions:
     def rev_board():
         """Reveal board information based on difficulty (colours)"""
+        global DIFFICULTY
         global board
         global col_board
         global turn
@@ -107,20 +115,22 @@ def game():
             return True  # game won
         
         matches = set()  # all hits on exact letter in spot
-        dyn_ans = ANSWER  # make mutable copy of answer
+        dyn_ans = list(ANSWER)  # make mutable copy of answer
 
-        for x in range(0, WORD_LEN):
-            if (guess[x] == ANSWER[x]):
-                col_board[turn][x] = COLOURS['GREEN']  # right letter in right pos
-                dyn_ans = dyn_ans[:x] + ' ' + dyn_ans[x + 1:]  # replace char with space
-                matches.add(x)  # add index to matches
+        if (DIFFICULTY != "Insane"):
+            for x in range(0, WORD_LEN):
+                if (guess[x] == ANSWER[x]):
+                    col_board[turn][x] = COLOURS['GREEN']  # right letter in right pos
+                    matches.add(x)  # add index to matches
+                    dyn_ans[x] = ' '  # erase char with empty str
 
         for x in range(0, WORD_LEN):
             if (guess[x] in dyn_ans) and (x not in matches):
+                idx = x  # find idx in dyn_ans
                 col_board[turn][x] = COLOURS['YELLOW']  # right letter in wrong pos
-                matches.add(dyn_ans.index(guess[x]))  # add index to matches
-                dyn_ans = dyn_ans[:x] + ' ' + dyn_ans[x + 1:]  # replace char with space
-            elif (x not in matches):
+                matches.add(idx)  # add index to matches
+                dyn_ans[dyn_ans.index(guess[x])] = ' '  # remove char, replace with str
+            elif (col_board[turn][x] == " "):  # if still not coloured
                 col_board[turn][x] = COLOURS['RED']  # not a letter in answer
 
         turn += 1  # next turn
