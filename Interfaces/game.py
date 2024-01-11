@@ -103,9 +103,7 @@ def game():
         global turn
         global pos
 
-        guess = ""  # guess str
-        for char in board[turn]:  # fetch current guess str
-            guess += char
+        guess = "".join(board[turn])  # get cur guess from board
 
         if (guess == ANSWER):  # entirely correct
             for i in range(0, WORD_LEN):
@@ -164,6 +162,7 @@ def game():
             return True
         else:  # not valid word
             return False
+
 
     running = True
     while running:
