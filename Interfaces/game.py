@@ -3,16 +3,15 @@ import copy
 import json
 import pygame
 import random
-import tkinter
 from tkinter import messagebox
-import vlc
+#import vlc
 
 def game():
     """Full Curdle Game Function"""
 
     # File Paths
     CONFIG_PATH = 'Database/config.json'
-    ans_words_path = 'Database/ez_words.txt'  # ez words by default
+    ans_words_path = 'Database/ez_words.txt'  # use ez words by default
     WORDS_PATH = 'Database/words.txt'
     TUTORIAL_PATH = 'Resources/tutorial.mp4'
 
@@ -34,17 +33,17 @@ def game():
         AI_MODE = json_config.get('AIMode')
 
     # Normal / Hard / Insane
-    if (DIFFICULTY == "Hard") or (DIFFICULTY == "Insane"):
+    if (DIFFICULTY in {"Hard", "Insane"}):
         ans_words_path = 'Database/words.txt'  # answer words are harder
     
     WORD_LIST = filter_words(WORDS_PATH, WORD_LEN)  # generate all possible words list
     ANS_WORD_LIST = filter_words(ans_words_path, WORD_LEN)  # generate all answer words list
-
+    """
     # Play Tutorial Video (if needed)
     if (TUTORIAL_MODE):
         video = vlc.MediaPlayer(TUTORIAL_PATH)
         video.play()
-
+"""
     # Initialize PyGame
     pygame.init()
 
@@ -96,8 +95,6 @@ def game():
     col_board = copy.deepcopy(board)  # make board copy
     
 
-
-# Game Functions:
     def rev_board():
         """Reveal board information based on difficulty (colours)"""
         global DIFFICULTY
@@ -115,21 +112,21 @@ def game():
                 col_board[turn][i] = COLOURS['GREEN']  # all letters are right
             return True  # game won
         
-        matches = []  # all hits on exact letter in spot
+        matches = set()  # all hits on exact letter in spot
         dyn_ans = list(ANSWER)  # make mutable copy of answer
 
         if (DIFFICULTY != "Insane"):
             for x in range(0, WORD_LEN):
                 if (guess[x] == ANSWER[x]):
                     col_board[turn][x] = COLOURS['GREEN']  # right letter in right pos
-                    matches.append(x)  # add index to matches
+                    matches.add(x)  # add index to matches
                     dyn_ans[x] = ' '  # erase char with empty str
 
         for x in range(0, WORD_LEN):
             if (guess[x] in dyn_ans) and (x not in matches):
                 idx = x  # find idx in dyn_ans
                 col_board[turn][x] = COLOURS['YELLOW']  # right letter in wrong pos
-                matches.append(idx)  # add index to matches
+                matches.add(idx)  # add index to matches
                 dyn_ans[dyn_ans.index(guess[x])] = ' '  # remove char, replace with str
             elif (col_board[turn][x] == " "):  # if still not coloured
                 col_board[turn][x] = COLOURS['RED']  # not a letter in answer
@@ -160,9 +157,7 @@ def game():
         """Validate word inputs (on enter)"""
         global board
         global turn
-        word = ""  # word str
-        for char in board[turn]:  # fetch current word str
-            word += char
+        word = "".join(board[turn])  # get current word str
         if (len(word) != WORD_LEN):  # if not valid len
             return False
         if (word in WORD_LIST):  # if it's an actual word
@@ -177,7 +172,11 @@ def game():
         pygame.display.flip()  # display game
 
         for event in pygame.event.get():
-            if (event.type == pygame.QUIT) or (game_over):  # window closed
+            if (event.type == pygame.QUIT):  # window closed
+                running = False  # close game
+                break  # close loop
+
+            if (game_over):  # game completed
                 restart_flag = messagebox.askquestion('Game Over', f'ANSWER: "{ANSWER}"\nWould you like to restart?')  # end msg
                 if (restart_flag == 'yes'):
                     pygame.quit()  # close pygame
@@ -188,7 +187,7 @@ def game():
 
             if (event.type == pygame.KEYDOWN):  # some key is pressed
                 if (event.key == pygame.K_KP_ENTER) or (event.key == pygame.K_RETURN):  # enter key was pressed (or return for mac)
-                    #print(ANSWER)
+                    print(ANSWER)
                     valid_word = word_check()  # check if current word is real & valid
                     if (valid_word):  # not valid word
                         game_over = rev_board()  # reveal the board visually & find out if game is over
@@ -206,6 +205,3 @@ def game():
 
             clock.tick(FPS)  # advance screen
     pygame.quit()
-
-
-

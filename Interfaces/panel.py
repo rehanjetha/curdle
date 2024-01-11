@@ -20,8 +20,8 @@ class Panel(ctk.CTk):
         ctk.set_appearance_mode('dark')  # set dark mode
         ctk.set_default_color_theme('blue')  # set blue theme
         self.resizable(width=False, height=False)  # disable resizing
-        self.create_widgets()  # create & place all widgetsdef on_closing():
-        self.protocol("WM_DELETE_WINDOW", sys.exit)  # close entire pgm if config closed
+        self.create_widgets()  # create & place all widgets
+        self.protocol("WM_DELETE_WINDOW", sys.exit)  # close entire pgm if panel closed
 
 
     def create_widgets(self):
@@ -76,6 +76,11 @@ class Panel(ctk.CTk):
         how_button.grid(row=5, column=2)
 
 
+    def __str__(self):
+        """Redefine string operator"""
+        return "Panel is online."
+
+
     def start(self):
         """Method to perform value checks & start game"""
 
@@ -106,9 +111,10 @@ class Panel(ctk.CTk):
         try:
             with open("Database/config.json", "w") as config_file:
                 json.dump(game_settings, config_file, indent=4)
+            messagebox.showinfo('Game Starting', 'The game is launching.')
             self.destroy()  # close panel
-        except:
-            messagebox.showerror('Missing CONFIG Folder', 'Error: Missing Database Folder. Closing program.')
+        except Exception as exc:
+            messagebox.showerror('Unhandled Error', f'Error: {exc}. Closing program.')
             sys.exit()  # fatal error
 
     def get_size(self):
