@@ -10,6 +10,9 @@ from tkinter import messagebox
 def game():
     """Full Curdle Game Function"""
 
+    window = tkinter.Tk()  # make tkinter window
+    tkinter.Tk.wm_withdraw()  # hide tkinter window
+
     # File Paths
     CONFIG_PATH = 'Database/config.json'
     ans_words_path = 'Database/ez_words.txt'  # use ez words by default
@@ -177,8 +180,6 @@ def game():
                 break  # close loop
 
             if (game_over):  # game completed
-                window = tkinter.Tk()  # make tkinter window
-                window.wm_withdraw()  # hide tkinter window
                 restart_flag = messagebox.askquestion('Game Over', f'ANSWER: "{ANSWER}"\nWould you like to restart?')  # end msg
                 if (restart_flag == 'yes'):
                     window.destroy()  # close window
@@ -190,7 +191,7 @@ def game():
 
             if (event.type == pygame.KEYDOWN):  # some key is pressed
                 if (event.key == pygame.K_KP_ENTER) or (event.key == pygame.K_RETURN):  # enter key was pressed (or return for mac)
-                    print(ANSWER)
+                    #print(ANSWER)
                     valid_word = word_check()  # check if current word is real & valid
                     if (valid_word):  # not valid word
                         game_over = rev_board()  # reveal the board visually & find out if game is over
