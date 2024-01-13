@@ -3,6 +3,7 @@ import copy
 import json
 import pygame
 import random
+import tkinter
 from tkinter import messagebox
 #import vlc
 
@@ -176,8 +177,11 @@ def game():
                 break  # close loop
 
             if (game_over):  # game completed
+                window = tkinter.Tk()  # make tkinter window
+                window.wm_withdraw()  # hide tkinter window
                 restart_flag = messagebox.askquestion('Game Over', f'ANSWER: "{ANSWER}"\nWould you like to restart?')  # end msg
                 if (restart_flag == 'yes'):
+                    window.destroy()  # close window
                     pygame.quit()  # close pygame
                     return True  # send true via game()
                 else:
