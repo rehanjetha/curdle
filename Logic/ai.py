@@ -1,9 +1,9 @@
-from search_sort import filter_words
+from Logic.search_sort import filter_words
 
 def word_ai(ANSWER, prev_guesses, GUESS_LEN, DIFFICULTY):
     """Word AI: Give an AI Word Suggestion"""
+    print('prev', prev_guesses)
     # Note: The assumption is that the word is unknown to the AI.
-    
     # Configuration Values
     WORD_PATH = 'Database/words.txt'  # all word file path
     WORD_LEN = len(ANSWER.strip())  # find word len
@@ -95,7 +95,7 @@ def word_ai(ANSWER, prev_guesses, GUESS_LEN, DIFFICULTY):
     max_idx = guess_score.index(max_score)
     my_guess = guess_ops[max_idx]
 
-    return my_guess
+    return "".join(my_guess)
 
 #print(word_ai('salet', [], 6, 'Normal'))
 

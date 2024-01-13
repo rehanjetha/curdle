@@ -1,17 +1,19 @@
 from Logic.search_sort import filter_words
+from Logic.ai import word_ai
 import copy
 import json
+from os import startfile
 import pygame
 import random
 import tkinter
 from tkinter import messagebox
-#import vlc
+
 
 def game():
     """Full Curdle Game Function"""
 
     window = tkinter.Tk()  # make tkinter window
-    tkinter.Tk.wm_withdraw()  # hide tkinter window
+    window.wm_withdraw()  # hide tkinter window
 
     # File Paths
     CONFIG_PATH = 'Database/config.json'
@@ -42,12 +44,11 @@ def game():
     
     WORD_LIST = filter_words(WORDS_PATH, WORD_LEN)  # generate all possible words list
     ANS_WORD_LIST = filter_words(ans_words_path, WORD_LEN)  # generate all answer words list
-    """
+
     # Play Tutorial Video (if needed)
     if (TUTORIAL_MODE):
-        video = vlc.MediaPlayer(TUTORIAL_PATH)
-        video.play()
-"""
+        startfile(TUTORIAL_PATH)  # play file
+
     # Initialize PyGame
     pygame.init()
 
@@ -190,6 +191,12 @@ def game():
                     break  # close loop
 
             if (event.type == pygame.KEYDOWN):  # some key is pressed
+                if (event.key == pygame.K_RSHIFT) and (AI_MODE):
+                    prev_guesses = []
+                    if (turn > 0):
+                        for i in range(turn):
+                            prev_guesses.append("".join(board[i]))  # get previous guesses
+                    print(f"AI's Choice: '{word_ai(ANSWER, prev_guesses, GUESS_LEN, DIFFICULTY)}'")
                 if (event.key == pygame.K_KP_ENTER) or (event.key == pygame.K_RETURN):  # enter key was pressed (or return for mac)
                     #print(ANSWER)
                     valid_word = word_check()  # check if current word is real & valid
