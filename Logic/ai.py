@@ -1,13 +1,15 @@
+import random
 from Logic.search_sort import filter_words
 
-def word_ai(ANSWER, prev_guesses, GUESS_LEN, DIFFICULTY):
+def word_ai(ANSWER, prev_guesses, DIFFICULTY):
     """Word AI: Give an AI Word Suggestion"""
-    print('prev', prev_guesses)
     # Note: The assumption is that the word is unknown to the AI.
     # Configuration Values
     WORD_PATH = 'Database/words.txt'  # all word file path
+    EZ_WORD_PATH = 'Database/ez_words.txt'  # easy words file path
     WORD_LEN = len(ANSWER.strip())  # find word len
     ALL_WORDS = filter_words(WORD_PATH, WORD_LEN)  # find all valid English words
+    EZ_WORDS = filter_words(EZ_WORD_PATH, WORD_LEN)  # find all easy words
     OPT_OPEN = {
         "3": "are",
         "4": "quai",
@@ -59,13 +61,11 @@ def word_ai(ANSWER, prev_guesses, GUESS_LEN, DIFFICULTY):
                 gre_lets[jdx] = letter  # right spot letter
             elif (symbol == 'y') and (letter not in yel_lets):
                 yel_lets.append(letter)  # right let, wrong pos
-            elif (symbol == 'x') and (letter not in red_lets):
+            elif (symbol == 'x') and (letter not in red_lets) and (letter not in gre_lets) and (letter not in yel_lets):
                 red_lets.append(letter)  # useless letter
 
     # Guess Loop
     guess_ops = []  # guess options (words)
-    guess_score = []  # guess scores (nums)
-    best_score = 0  # best word guess score
 
     for word in ALL_WORDS:
         score = 0  # default word score
@@ -81,21 +81,43 @@ def word_ai(ANSWER, prev_guesses, GUESS_LEN, DIFFICULTY):
         if (bad_word):
             continue  # next word
 
-        for idx, letter in enumerate(word):
-            if (letter in yel_lets):
-                score += 1
-            elif (letter in red_lets):
-                score -= float('-inf')
+        for idx, letter in enumerate(yel_lets):
+            if (letter not in word):
+                bad_word = True
+                break  # close word search
+        if (bad_word):
+            continue  # next word
+
+        for idx, letter in enumerate(red_lets):
+            if (letter in word):
+                bad_word = True
+                break  # close word search
+        if (bad_word):
+            continue  # next word
         
-        guess_ops.append(word)  # add word
-        guess_score.append(score)  # add corresponding score
+        # Evaluation Heuristic
+        char_counts = {}
+        for char in word:
+            char_counts[char] = char_counts.get(char, 0) + 1  # add 1 to entry (or create one)
 
-    # Choose Highest Scoring Word (Guess)
-    max_score = max(guess_score)
-    max_idx = guess_score.index(max_score)
-    my_guess = guess_ops[max_idx]
+        if (word in EZ_WORDS):
+            guess_ops.append([word, 0])  # add word & score
+        else:
+            guess_ops.append([word, max(char_counts.values())])  # add word & score
 
-    return "".join(my_guess)
+    # Selection Sort
+    for top in range(len(guess_ops)-1,0,-1):
+        largest_loc = 0  # largest element location
+        for i in range(1, top+1):
+            if (guess_ops[i][1] < guess_ops[largest_loc][1]):
+                largest_loc = i  # new largest
+            guess_ops[top], guess_ops[largest_loc] = guess_ops[largest_loc], guess_ops[top]  # swap places
 
+    # choose best word
+    if guess_ops:
+        return "".join(guess_ops[-1][0])  # best word is last
+    else:  # no valid words
+        return random.choice(ALL_WORDS)
+    
 #print(word_ai('salet', [], 6, 'Normal'))
 

@@ -2,9 +2,11 @@ from Logic.search_sort import filter_words
 from Logic.ai import word_ai
 import copy
 import json
-from os import startfile
+import os 
 import pygame
 import random
+import subprocess
+import sys
 import tkinter
 from tkinter import messagebox
 
@@ -46,8 +48,13 @@ def game():
     ANS_WORD_LIST = filter_words(ans_words_path, WORD_LEN)  # generate all answer words list
 
     # Play Tutorial Video (if needed)
+    # Source: https://stackoverflow.com/questions/17317219/is-there-an-platform-independent-equivalent-of-os-startfile
     if (TUTORIAL_MODE):
-        startfile(TUTORIAL_PATH)  # play file
+        if sys.platform == "win32":
+            os.startfile(TUTORIAL_PATH)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, TUTORIAL_PATH])
 
     # Initialize PyGame
     pygame.init()
@@ -196,7 +203,7 @@ def game():
                     if (turn > 0):
                         for i in range(turn):
                             prev_guesses.append("".join(board[i]))  # get previous guesses
-                    print(f"AI's Choice: '{word_ai(ANSWER, prev_guesses, GUESS_LEN, DIFFICULTY)}'")
+                    messagebox.showinfo('AI Mode', f"AI Word: '{word_ai(ANSWER, prev_guesses, DIFFICULTY).upper()}'")
                 if (event.key == pygame.K_KP_ENTER) or (event.key == pygame.K_RETURN):  # enter key was pressed (or return for mac)
                     #print(ANSWER)
                     valid_word = word_check()  # check if current word is real & valid
