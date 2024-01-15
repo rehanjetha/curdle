@@ -1,7 +1,7 @@
 {
-    "difficulty": "Insane",
-    "wordLength": 4,
-    "guessLength": 10,
+    "difficulty": "Normal",
+    "wordLength": 5,
+    "guessLength": 6,
     "tutorial": false,
     "AIMode": true
 }

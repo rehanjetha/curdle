@@ -69,7 +69,6 @@ def word_ai(ANSWER, prev_guesses, DIFFICULTY):
     guess_ops = []  # guess options (words)
 
     for word in ALL_WORDS:
-        score = 0  # default word score
         bad_word = False  # skip the word
         word = list(word)  # convert word to list
 
@@ -101,7 +100,7 @@ def word_ai(ANSWER, prev_guesses, DIFFICULTY):
         for char in word:
             char_counts[char] = char_counts.get(char, 0) + 1  # add 1 to entry (or create one)
 
-        if (word in EZ_WORDS):
+        if ("".join(word) in EZ_WORDS):
             guess_ops.append([word, 0])  # add word & score
         else:
             guess_ops.append([word, max(char_counts.values())])  # add word & score
@@ -112,13 +111,15 @@ def word_ai(ANSWER, prev_guesses, DIFFICULTY):
         for i in range(1, top+1):
             if (guess_ops[i][1] < guess_ops[largest_loc][1]):
                 largest_loc = i  # new largest
-            guess_ops[top], guess_ops[largest_loc] = guess_ops[largest_loc], guess_ops[top]  # swap places
+        guess_ops[top], guess_ops[largest_loc] = guess_ops[largest_loc], guess_ops[top]  # swap places
 
     # choose best word
     if guess_ops:
-        return "".join(guess_ops[-1][0])  # best word is last
+        if (prev_guesses[-1] == "".join(guess_ops[-1][0])):
+            return "".join(guess_ops[-2][0])  # 2nd best word is last
+        else:
+            return "".join(guess_ops[-1][0])  # best word is last
     else:  # no valid words
         return random.choice(ALL_WORDS)
     
 #print(word_ai('salet', [], 6, 'Normal'))
-
