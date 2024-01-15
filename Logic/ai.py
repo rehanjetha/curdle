@@ -4,6 +4,7 @@ from Logic.search_sort import filter_words
 def word_ai(ANSWER, prev_guesses, DIFFICULTY):
     """Word AI: Give an AI Word Suggestion"""
     # Note: The assumption is that the word is unknown to the AI.
+    
     # Configuration Values
     WORD_PATH = 'Database/words.txt'  # all word file path
     EZ_WORD_PATH = 'Database/ez_words.txt'  # easy words file path
